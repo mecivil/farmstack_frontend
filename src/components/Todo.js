@@ -3,7 +3,7 @@ import React from 'react'
 function TodoItem(props) {
     const deleteTodoHandler = (title) => {
         console.log(title)
-        axios.delete(`http://localhost:8000/api/todo/${title}`).then(res => console.log(res.data))}
+        axios.delete(`https://fastapi-backend-x9p9.onrender.com/api/todo/${title}`).then(res => console.log(res.data))}
 
         return(
             <div>

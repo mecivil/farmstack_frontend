@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useLocation } from "react-router-dom";
 import 'bootstrap/dist/css/bootstrap.min.css'
 import axios from 'axios';
-function Login() {
+function Login({route,navigator}) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [sloading, setLoadings] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation()
+  var role=location.state.id;
 
   const validateForm = () => {
     if (!username || !password) {
@@ -44,20 +47,31 @@ function Login() {
     formDetails.append('password', password);
 
     try {
-      const response = await fetch('https://fastapi-backend-x9p9.onrender.com/token', {
+      var response='';
+      if(role=="user"){
+      response = await fetch('https://fastapi-backend-x9p9.onrender.com/token', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
         body: formDetails,
       });
+    }else{
+      response = await fetch('https://fastapi-backend-x9p9.onrender.com/token_admin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formDetails,
+      });
+    }
 
       setLoading(false);
 
       if (response.ok) {
         const data = await response.json();
         localStorage.setItem('token', data.access_token);
-        navigate('/protected');
+        navigate('/protected',{state:{id:role}});
       } else {
         const errorData = await response.json();
         setError(errorData.detail || 'Authentication failed! Sign up first');
@@ -71,6 +85,7 @@ function Login() {
   return (
     <div className="App list-group-item justify-content center align-items-center mx-auto" style={{'vw':'1100px', "backgroundColor": "white","marginTop":"255px"}}>
       <form onSubmit={handleSubmit}>
+        <div><p>For doubts related to admin rights please visit <a href="https://github.com/mecivil/farmstack_frontend">Owner Website</a></p></div>
         <div>
           <input
             class="mb-3 col-sm-2 col-form-label"
@@ -92,7 +107,7 @@ function Login() {
         <button type="submit" class="mx-auto" disabled={loading} style={{'borderRadius':'50px','fontWeight':"bold"}}>
           {loading ? 'Logging in...' : 'Login'}
         </button>
-        <button type="button"  disabled={loading} onClick={handleSignUp} style={{'marginLeft':'25px','borderRadius':'50px','fontWeight':"bold"}}>
+        <button type="button"  disabled={sloading || role=="admin"} onClick={handleSignUp} style={{'marginLeft':'25px','borderRadius':'50px','fontWeight':"bold"}}>
           {sloading ? 'Signing up...' : 'Sign up'}
         </button>
         {error && <p style={{ color: 'red' }}>{error}</p>}

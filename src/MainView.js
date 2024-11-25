@@ -1,11 +1,13 @@
 import './App.css';
 import React , {useState,useEffect} from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Button from 'react-bootstrap/Button';
 import TodoView  from './components/TodoListView.js';
 function MainView() {
+  const location = useLocation();
+  var role=location.state.id;
   const [todoList,setTodoList] = useState([{}])
   const [title,setTitle] = useState('')
   const [desc,setDesc] = useState('')
@@ -28,7 +30,7 @@ function MainView() {
    //Logout Handler
    const LogoutHandler=()=>{
     localStorage.removeItem('token');
-    navigate('/protected');
+    navigate('/protected',{state:{id:role}});
    };
   //Post a todo
    const addTodoHandler = () => {
